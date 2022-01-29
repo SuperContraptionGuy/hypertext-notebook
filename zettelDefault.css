@@ -1,0 +1,26 @@
+div.references ol li{
+
+	counter-increment: ordinal
+}
+
+div.references ol li:before{
+
+	content: "[" counter(ordinal) "] ";
+}
+
+div.references ol{
+
+	list-style: none;
+	counter-reset: ordinal;
+}
+
+div.references ul{
+
+	list-style: none;
+}
+
+div.references ul{
+
+	/*font-size: smaller;*/
+	
+}
