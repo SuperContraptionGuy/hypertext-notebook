@@ -91,6 +91,9 @@ $refSplit = preg_split("/(?<=[a-z])(?=\d)|(?<=\d)(?=[a-z])/", $referenceFilename
 // get the number of fields by counting the size of the array
 $refNumFields = count($refSplit);
 
+
+// TODO:
+
 // next step is to choose use the if statements below to follow an option, then do some math on the last field by converting alphabetic characters from base 26 to base 10 using convBase() function, converting that to an integer, increment by one, then convert back to string, from base10 to base26, and append all the fields together.  Add a .html file extension, and there's the file name.  If it's an add child option, then just add a new field with the lowest value (1 or a) depending on if it's an even or odd field (odd fields are numbers, even fields are letters), append all fields (including new one), append .html, and there ya go.
 
 echo "URL GET string was ";
@@ -102,7 +105,12 @@ echo "reference Filename split array: \n";
 var_dump($refSplit);
 echo "refarray size: \n";
 var_dump($refNumFields);
-//convBase();
+
+
+//convBase(); for converting letter codes from base26 to base10, then use
+//intval();   to type cast the decimal string to an int for math.
+
+//implode();  to recombine array into a string after modifying the array by changing an element or adding an element
 
 
 // $option should be either "child" or "sibling", or maybe "next" or "fork". Default to "next"
