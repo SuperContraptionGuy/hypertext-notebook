@@ -84,15 +84,24 @@ $referenceFilename = "0";
 // parse the reference filename.  chop out all the number and letter sections.  convert letters to numbers? Then in the next function, either increment the final field, or add a new field and regenerate an alphanumeric field.
 
 // parse into array, get dimensions.
-// split at alphanumberic boundaries
-$refSplit = preg_split("/(?<=[a-z])\d|(?<=\d)[a-z]/", $referenceFilename);
+// cut off file name if it exists
+$referenceFilename = explode(".html", $referenceFilename)[0];
+// split string into array at alphanumberic boundaries
+$refSplit = preg_split("/(?<=[a-z])(?=\d)|(?<=\d)(?=[a-z])/", $referenceFilename);
+// get the number of fields by counting the size of the array
 $refNumFields = count($refSplit);
+
+// next step is to choose use the if statements below to follow an option, then do some math on the last field by converting alphabetic characters from base 26 to base 10 using convBase() function, converting that to an integer, increment by one, then convert back to string, from base10 to base26, and append all the fields together.  Add a .html file extension, and there's the file name.  If it's an add child option, then just add a new field with the lowest value (1 or a) depending on if it's an even or odd field (odd fields are numbers, even fields are letters), append all fields (including new one), append .html, and there ya go.
 
 echo "URL GET string was ";
 var_dump($_GET);
 echo "Extracted \n";
 var_dump($referenceFilename);
 var_dump($option);
+echo "reference Filename split array: \n";
+var_dump($refSplit);
+echo "refarray size: \n";
+var_dump($refNumFields);
 //convBase();
 
 
@@ -109,7 +118,7 @@ if (strcmp($option, "child") == 0 || strcmp($option, "fork") == 0) {
 
 }
 
-$name = ;
+//$name = ;
 
 ?>
 ID number: <input type="text" name="id_number" value="<?php echo $name; ?>"><br>
