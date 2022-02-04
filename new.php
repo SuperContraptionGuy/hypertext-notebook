@@ -32,15 +32,20 @@ $part4 = 	substr($nextpart, 0, strpos($nextpart, "|"));
 $nextpart = 	substr($nextpart, strpos($nextpart, "|")+1);
 $part5 = 	substr($nextpart, 0, strpos($nextpart, "|"));
 $nextpart = 	substr($nextpart, strpos($nextpart, "|")+1);
-//$part6 = 	substr($nextpart, 0, strpos($nextpart, "|"));
-$part6 = $nextpart;
+$part6 = 	substr($nextpart, 0, strpos($nextpart, "|"));
+$nextpart = 	substr($nextpart, strpos($nextpart, "|")+1);
+$part7 = 	substr($nextpart, 0, strpos($nextpart, "|"));
+
+$nextpart = 	substr($nextpart, strpos($nextpart, "|")+1);
+//$part8 = 	substr($nextpart, 0, strpos($nextpart, "|"));
+$part8 = $nextpart;
 
 //$filefooter = substr($filefooter, strpos($filefooter, "<!-- ===== -->"));
 //$fileheader = substr($fileold, 0, strpos($fileold, "<!-- ===== -->")+14);
 
 //$filenew = $fileheader.$filenew.$filefooter;
 
-$filenew = $part1.$short_title.$part2.$url_to_self.$part3.$id_number.$part4.$long_title.$part5.$url_to_self.$part6;
+$filenew = $part1.$short_title.$part2.$url_to_self.$part3.$id_number.$part4.$long_title.$part5.$url_to_self.$part6.$url_to_self.$part7.$url_to_self.$part8;
 
 //echo $filenew;
 
