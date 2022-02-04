@@ -8,7 +8,8 @@
 $id_number = $_POST["id_number"];
 $short_title = $_POST["short_title"];
 $long_title = $_POST["long_title"];
-$url_to_self = $id_number.".html";
+//$url_to_self = $id_number.".html";
+$url_to_self = $_POST["self"];
 $url_to_previous = $_POST["previous"];
 $url_to_parent = $_POST["parent"];
 $url_to_child = $_POST["child"];
