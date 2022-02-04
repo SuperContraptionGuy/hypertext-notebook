@@ -41,7 +41,8 @@ function convBase($numberInput, $fromBaseInput, $toBaseInput)
     {
         $retval=0;
         for ($i = 1;$i <= $numberLen; $i++)
-            $retval = bcadd($retval, bcmul(array_search($number[$i-1], $fromBase),bcpow($fromLen,$numberLen-$i)));
+            //$retval = bcadd($retval, bcmul(array_search($number[$i-1], $fromBase),bcpow($fromLen,$numberLen-$i)));
+	bcadd("0", "1");
         return $retval;
     }
     if ($fromBaseInput != '0123456789')
@@ -86,7 +87,7 @@ $referenceFilename = "0";
 // parse into array, get dimensions.
 // cut off file name if it exists
 $referenceFilename = explode(".html", $referenceFilename)[0];
-// split string into array at alphanumberic boundaries
+// split string into array at alphanumberic boundaries.  Tested with awesome tool https://regex101.com/
 $refSplit = preg_split("/(?<=[a-z])(?=\d)|(?<=\d)(?=[a-z])/", $referenceFilename);
 // get the number of fields by counting the size of the array
 $refNumFields = count($refSplit);
@@ -109,27 +110,69 @@ var_dump($refNumFields);
 
 //convBase(); for converting letter codes from base26 to base10, then use
 //intval();   to type cast the decimal string to an int for math.
+//strval();	to go the other way.
 
 //implode();  to recombine array into a string after modifying the array by changing an element or adding an element
 
 
 // $option should be either "child" or "sibling", or maybe "next" or "fork". Default to "next"
 
+$branchValue = 0;
+// determine numeric value of last array element
+if ($refNumFields % 2 == 0) {	// if is even -> is alphabet
+
+	$branchValue = intval(convBase($refSplit[$refNumFields - 1], "abcdefghijklmnopqrstuvwxyz", "0123456789"));
+
+} else {	// is odd -> is decimal number
+
+	$branchValue = intval($refSplit[$refNumFields - 1]);
+}
+
 if (strcmp($option, "child") == 0 || strcmp($option, "fork") == 0) {
-// was "child" or "fork"
+	// was "child" or "fork"
+	
+	
+	$refSplit[] = "";	// add a new element to array, odd or even, then find the last file on the system.
+	$refNumFields += 1;	// increase length by one.
 
 
 //} elseif (strcmp($option, "sibling") == 0 || strcmp($option, "next") {
 } else {
 // was "sibling" or "next"
 // was something else. Default to "next"
+// do nothing.
 
 }
+$newFileSplit = $refSplit;
+echo "original value: ";
+echo var_dump($branchValue);
+do {
+	$branchValue += 1;
+	echo "branch new value";
+	echo var_dump($branchValue);
+	if ($refNumFields % 2 == 0) {
+		// even -> alphabet
+		$newFileSplit[$refNumFields - 1] = convBase(strval($branchValue), "0123456789", "abcdefghijklmnopqrstuvwxyz");
+	} else {
+		// odd -> numeric decimal
+		$newFileSplit[$refNumFields - 1] = strval($branchValue);
+	}
+	$newFileName = implode($newFileSplit) . ".html";
+
+	echo "test this name: ";
+
+	echo var_dump($newFileName);
+
+}
+while(file_exists($newFileName));
+
+echo "Decided on this filename:";
+echo var_dump($newFileName);
 
 //$name = ;
 
 ?>
-ID number: <input type="text" name="id_number" value="<?php echo $name; ?>"><br>
+ID number: <input type="text" name="id_number" value="<?php echo explode(".html", $newFileName)[0]; ?>"><br>
 Short title: <input type="text" name="short_title"> (This can't be changed)<br>
 Long title: <input type="text" name="long_title"> (This can be adjusted later)<br>
 
