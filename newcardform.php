@@ -27,6 +27,7 @@ URL to self
 -->
 <?php
 // function for letters to number pasted from comment on https://www.php.net/manual/en/function.base-convert.php
+// uses bcmath extension to work, installed with apt install bcmath.... something
 function convBase($numberInput, $fromBaseInput, $toBaseInput)
 {
     if ($fromBaseInput==$toBaseInput) return $numberInput;
@@ -41,8 +42,7 @@ function convBase($numberInput, $fromBaseInput, $toBaseInput)
     {
         $retval=0;
         for ($i = 1;$i <= $numberLen; $i++)
-            //$retval = bcadd($retval, bcmul(array_search($number[$i-1], $fromBase),bcpow($fromLen,$numberLen-$i)));
-	bcadd("0", "1");
+            $retval = bcadd($retval, bcmul(array_search($number[$i-1], $fromBase),bcpow($fromLen,$numberLen-$i)));
         return $retval;
     }
     if ($fromBaseInput != '0123456789')
@@ -97,15 +97,15 @@ $refNumFields = count($refSplit);
 
 // next step is to choose use the if statements below to follow an option, then do some math on the last field by converting alphabetic characters from base 26 to base 10 using convBase() function, converting that to an integer, increment by one, then convert back to string, from base10 to base26, and append all the fields together.  Add a .html file extension, and there's the file name.  If it's an add child option, then just add a new field with the lowest value (1 or a) depending on if it's an even or odd field (odd fields are numbers, even fields are letters), append all fields (including new one), append .html, and there ya go.
 
-echo "URL GET string was ";
-var_dump($_GET);
-echo "Extracted \n";
-var_dump($referenceFilename);
-var_dump($option);
-echo "reference Filename split array: \n";
-var_dump($refSplit);
-echo "refarray size: \n";
-var_dump($refNumFields);
+//echo "URL GET string was ";
+//var_dump($_GET);
+//echo "Extracted \n";
+//var_dump($referenceFilename);
+//var_dump($option);
+//echo "reference Filename split array: \n";
+//var_dump($refSplit);
+//echo "refarray size: \n";
+//var_dump($refNumFields);
 
 
 //convBase(); for converting letter codes from base26 to base10, then use
@@ -121,7 +121,7 @@ $branchValue = 0;
 // determine numeric value of last array element
 if ($refNumFields % 2 == 0) {	// if is even -> is alphabet
 
-	$branchValue = intval(convBase($refSplit[$refNumFields - 1], "abcdefghijklmnopqrstuvwxyz", "0123456789"));
+	$branchValue = intval(convBase($refSplit[$refNumFields - 1], "_abcdefghijklmnopqrstuvwxyz", "0123456789"));
 
 } else {	// is odd -> is decimal number
 
@@ -133,6 +133,7 @@ if (strcmp($option, "child") == 0 || strcmp($option, "fork") == 0) {
 	
 	
 	$refSplit[] = "";	// add a new element to array, odd or even, then find the last file on the system.
+	$branchValue = 0;	// default value to start incrementing on
 	$refNumFields += 1;	// increase length by one.
 
 
@@ -144,30 +145,32 @@ if (strcmp($option, "child") == 0 || strcmp($option, "fork") == 0) {
 
 }
 $newFileSplit = $refSplit;
-echo "original value: ";
-echo var_dump($branchValue);
+//echo "original value: ";
+//echo var_dump($branchValue);
 do {
 	$branchValue += 1;
-	echo "branch new value";
-	echo var_dump($branchValue);
+	//echo "branch new value";
+	//echo var_dump($branchValue);
 	if ($refNumFields % 2 == 0) {
 		// even -> alphabet
-		$newFileSplit[$refNumFields - 1] = convBase(strval($branchValue), "0123456789", "abcdefghijklmnopqrstuvwxyz");
+		$newFileSplit[$refNumFields - 1] = convBase(strval($branchValue), "0123456789", "_abcdefghijklmnopqrstuvwxyz");
 	} else {
 		// odd -> numeric decimal
 		$newFileSplit[$refNumFields - 1] = strval($branchValue);
 	}
-	$newFileName = implode($newFileSplit) . ".html";
 
-	echo "test this name: ";
+	// str_replace helps get the kind of letter counting overflow effect I want (z, aa, ab, ac, ...)
+	$newFileName = str_replace("_", "a", implode($newFileSplit)) . ".html";
 
-	echo var_dump($newFileName);
+	//echo "test this name: ";
+
+	//echo var_dump($newFileName);
 
 }
 while(file_exists($newFileName));
 
-echo "Decided on this filename:";
-echo var_dump($newFileName);
+//echo "Decided on this filename:";
+//echo var_dump($newFileName);
 
 //$name = ;
 
