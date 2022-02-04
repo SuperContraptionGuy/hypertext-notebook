@@ -20,11 +20,7 @@ URL to self
 
 
 -->
-
 <form action="new.php" method="post">
-
-<!-- ID number: <input type="text" name="id_number" value="<?php $date = new DateTime(); echo $date->format('Y.m.d.H.i'); ?>">(Format: yyyy.mm.dd.hh.mm Can't be changed, use unique number.)<br>
--->
 <?php
 // function for letters to number pasted from comment on https://www.php.net/manual/en/function.base-convert.php
 // uses bcmath extension to work, installed with apt install bcmath.... something
@@ -93,8 +89,6 @@ $refSplit = preg_split("/(?<=[a-z])(?=\d)|(?<=\d)(?=[a-z])/", $referenceFilename
 $refNumFields = count($refSplit);
 
 
-// TODO:
-
 // next step is to choose use the if statements below to follow an option, then do some math on the last field by converting alphabetic characters from base 26 to base 10 using convBase() function, converting that to an integer, increment by one, then convert back to string, from base10 to base26, and append all the fields together.  Add a .html file extension, and there's the file name.  If it's an add child option, then just add a new field with the lowest value (1 or a) depending on if it's an even or odd field (odd fields are numbers, even fields are letters), append all fields (including new one), append .html, and there ya go.
 
 //echo "URL GET string was ";
@@ -144,40 +138,91 @@ if (strcmp($option, "child") == 0 || strcmp($option, "fork") == 0) {
 // do nothing.
 
 }
-$newFileSplit = $refSplit;
-//echo "original value: ";
-//echo var_dump($branchValue);
-do {
-	$branchValue += 1;
-	//echo "branch new value";
-	//echo var_dump($branchValue);
+// return filename from array
+function modifyName($branchValue, $refNumFields, $newFileSplit) {
+	//$branchValue += 1;
 	if ($refNumFields % 2 == 0) {
 		// even -> alphabet
-		$newFileSplit[$refNumFields - 1] = convBase(strval($branchValue), "0123456789", "_abcdefghijklmnopqrstuvwxyz");
+		//$newFileSplit[$refNumFields - 1] = convBase(strval($branchValue), "0123456789", "_abcdefghijklmnopqrstuvwxyz");
+
+		// str_replace helps get the kind of letter counting overflow effect I want (z, aa, ab, ac, ...)
+		$newFileSplit[$refNumFields - 1] = str_replace("_", "a", convBase(strval($branchValue), "0123456789", "_abcdefghijklmnopqrstuvwxyz"));
 	} else {
 		// odd -> numeric decimal
 		$newFileSplit[$refNumFields - 1] = strval($branchValue);
 	}
+	return $newFileSplit;
+}
+function getFileName($newFileSplit) {
 
-	// str_replace helps get the kind of letter counting overflow effect I want (z, aa, ab, ac, ...)
-	$newFileName = str_replace("_", "a", implode($newFileSplit)) . ".html";
+	//$newFileSplit = modifyName($branchValue, $refNumFields, $newFileSplit);
+	return implode($newFileSplit) . ".html";
+}
 
-	//echo "test this name: ";
-
-	//echo var_dump($newFileName);
-
+// return next available
+$newFileSplit = $refSplit;
+do {
+	$branchValue += 1;
+	$newFileName = getFileName(modifyName($branchValue, $refNumFields, $newFileSplit));
 }
 while(file_exists($newFileName));
+// branchValue now hold the value for the filename to be used.
 
-//echo "Decided on this filename:";
-//echo var_dump($newFileName);
+// return next
+$next = getFileName(modifyName($branchValue + 1, $refNumFields, $newFileSplit));
 
-//$name = ;
+// return previous
+// only get previous file if this isn't the first child in this branch
+if ($branchValue > 1) {
+	$previous = getFileName(modifyName($branchValue - 1, $refNumFields, $newFileSplit));
+} else {
+	$previous = $newFileName;
+}
+
+// return child
+// set var to base file
+$childFileSplit = modifyName($branchValue, $refNumFields, $newFileSplit);
+$childFileSplit[] = "";	// add an empty element to the array
+$childNumFields = $refNumFields + 1;	// add one to the size	
+// use 1 to get name of first child
+$child = getFileName(modifyName(1, $childNumFields, $childFileSplit));
+
+// return parent
+// only return if we're not at the top of the hierarchy already
+if ($refNumFields > 1) {
+	$parentFileSplit = array_slice($newFileSplit, 0, -1);	// trim off last element
+	$parent = getFileName($parentFileSplit);
+} else {
+	$parent = $newFileName;
+}
+
+
+echo "previous, parent, child, next: ";
+echo var_dump($previous);
+echo var_dump($parent);
+echo var_dump($child);
+echo var_dump($next);
+
 
 ?>
-ID number: <input type="text" name="id_number" value="<?php echo explode(".html", $newFileName)[0]; ?>"><br>
+<!--
+ID number: <input type="text" name="id_number" value="<-?php echo explode(".html", $newFileName)[0]; ?>"><br>
+-->
+<br>
+Card ID: <?php echo explode(".html", $newFileName)[0]; ?> 
+<br>
+New card: <?php echo $newFileName; ?>
+<br>
 Short title: <input type="text" name="short_title"> (This can't be changed)<br>
 Long title: <input type="text" name="long_title"> (This can be adjusted later)<br>
+
+<!-- hidden inputs to send post data -->
+<input name="id_number"	type="hidden" value="<?php echo explode(".html", $newFileName)[0]; ?>"/>
+<input name="self" 	type="hidden" value="<?php echo $newFileName; ?>"/>
+<input name="previous" 	type="hidden" value="<?php echo $previous; ?>"/>
+<input name="parent" 	type="hidden" value="<?php echo $parent; ?>"/>
+<input name="child" 	type="hidden" value="<?php echo $child; ?>"/>
+<input name="next" 	type="hidden" value="<?php echo $next; ?>"/>
 
 
 <p><input type="submit" value="Create" /> (Go back to cancel)</p>
