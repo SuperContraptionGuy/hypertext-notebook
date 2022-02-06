@@ -57,13 +57,13 @@ echo $filestring;
 <input type="file" name="file_to_upload" id="file_to_upload">
 <br>
 <input type="button" value="Upload File" id="upload_file_button">
-<span id="response"></span>
+<div id="response"></div>
 
 <script>
 
 function gotResponse(response) {
 
-	document.getElementById("response").innerHTML = response;
+	document.getElementById("response").innerHTML = document.getElementById("response").innerHTML.concat('<br>', response);
 }
 
 function uploadFile(file) {
