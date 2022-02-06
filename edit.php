@@ -49,7 +49,47 @@ echo $filestring;
 </script>
 
 
- <p><input type="submit" value="Save" /></p>
-
-
+ <p>
+<input type="submit" value="Save" />
+</p>
 </form>
+
+<input type="file" name="file_to_upload" id="file_to_upload">
+<br>
+<input type="button" value="Upload File" id="upload_file_button">
+<span id="response"></span>
+
+<script>
+
+function gotResponse(response) {
+
+	document.getElementById("response").innerHTML = response;
+}
+
+function uploadFile(file) {
+
+	var formData = new FormData();
+	formData.append('file_to_upload', file);
+	formData.append('note_name', "<?php echo $_GET['file']; ?>");
+	var ajax = new XMLHttpRequest();
+	ajax.onreadystatechange = function() {
+		if(ajax.readyState === 4) {
+			gotResponse(ajax.response);
+		}
+	};
+	ajax.open('POST', 'uploader.php');
+	ajax.send(formData);
+}
+
+document.getElementById('file_to_upload').addEventListener('change', (event) => {
+
+	window.selectedFile = event.target.files[0];
+	});
+
+document.getElementById('upload_file_button').addEventListener('click', (event) => {
+
+	uploadFile(window.selectedFile);
+	});
+
+
+</script>
